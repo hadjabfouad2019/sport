@@ -3,49 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اليوم 1 - كمال الأجسام</title>
+    <title>تمارين اليوم 1</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
     <div class="container">
-        <h1>اليوم 1</h1>
+        <a href="index.html" class="back-button">العودة للرئيسية</a>
+        <h1>تمارين اليوم 1</h1>
 
-        <!-- التمرين 1 -->
-        <div class="exercise-box">
-            <img src="h.png" alt="ضغط الصدر">
-            <h2>ضغط الصدر بالبار</h2>
-            <input type="number" id="day1-ex1-start" placeholder="الوزن الابتدائي (كجم)" min="0">
-            <input type="number" id="day1-ex1-max" placeholder="أقصى وزن وصلت إليه (كجم)" min="0">
-            <input type="number" id="day1-ex1-sets" placeholder="عدد المجموعات" min="1" value="3">
-            <input type="number" id="day1-ex1-reps" placeholder="عدد التكرارات" min="1" value="8">
-            <button onclick="saveProgress('day1-ex1')">حفظ التقدم</button>
-            <div class="history" id="day1-ex1-history"></div>
-            <div id="day1-ex1-badge" class="badge"></div>
-            <canvas id="day1-ex1-chart" height="80"></canvas>
+        <div class="exercise-card" data-exercise="day1-ex1">
+            <h2>تمرين ضغط الصدر</h2>
+            <img src="a.jpg" alt="تمرين ضغط الصدر" class="exercise-image">
+            <div class="input-group">
+                <label>الوزن الابتدائي (كجم):</label>
+                <input type="number" class="initial-weight-input" placeholder="الوزن">
+            </div>
+            <div class="input-group">
+                <label>أقصى وزن (كجم):</label>
+                <input type="number" class="max-weight-input" placeholder="أقصى وزن">
+            </div>
+            <div class="input-group">
+                <label>عدد المجموعات:</label>
+                <input type="number" class="sets-input" placeholder="عدد المجموعات">
+            </div>
+            <div class="input-group reps-group">
+                <label>التكرارات:</label>
+                <div class="reps-inputs-container">
+                   <h5>15</h5>
+                   <h5>14</h5>
+                   <h5>16</h5>
+                   <h5>54</h5>
+                </div>
+            </div>
+            <button class="save-button">حفظ التقدم</button>
+            <div class="history-section">
+                <h3>السجل السابق:</h3>
+                <ul class="history-list"></ul>
+            </div>
         </div>
 
-        <!-- التمرين 2 -->
-        <div class="exercise-box">
-            <img src="a.jpg" alt="السكت">
-            <h2>السكت (Squat)</h2>
-            <input type="number" id="day1-ex2-start" placeholder="الوزن الابتدائي (كجم)" min="0">
-            <input type="number" id="day1-ex2-max" placeholder="أقصى وزن وصلت إليه (كجم)" min="0">
-            <input type="number" id="day1-ex2-sets" placeholder="عدد المجموعات" min="1" value="3">
-            <input type="number" id="day1-ex2-reps" placeholder="عدد التكرارات" min="1" value="8">
-            <button onclick="saveProgress('day1-ex2')">حفظ التقدم</button>
-            <div class="history" id="day1-ex2-history"></div>
-            <div id="day1-ex2-badge" class="badge"></div>
-            <canvas id="day1-ex2-chart" height="80"></canvas>
-        </div>
-
-        <!-- يمكنك إضافة المزيد كما تريد... -->
-
-        <div class="nav-footer">
-            <a href="index.html">← العودة للرئيسية</a>
+        <div class="exercise-card" data-exercise="day1-ex2">
+            <h2>تمرين الرفعة المميتة</h2>
+            <img src="images/deadlift.jpg" alt="تمرين الرفعة المميتة" class="exercise-image">
+            <div class="input-group">
+                <label>الوزن الابتدائي (كجم):</label>
+                <input type="number" class="initial-weight-input" placeholder="الوزن">
+            </div>
+            <div class="input-group">
+                <label>أقصى وزن (كجم):</label>
+                <input type="number" class="max-weight-input" placeholder="أقصى وزن">
+            </div>
+            <div class="input-group">
+                <label>عدد المجموعات:</label>
+                <input type="number" class="sets-input" placeholder="عدد المجموعات">
+            </div>
+            <div class="input-group reps-group">
+                <label>التكرارات:</label>
+                <div class="reps-inputs-container">
+                    <input type="number" class="reps-input" placeholder="مجموعة 1">
+                    <input type="number" class="reps-input" placeholder="مجموعة 2">
+                    <input type="number" class="reps-input" placeholder="مجموعة 3">
+                    <input type="number" class="reps-input" placeholder="مجموعة 4">
+                </div>
+            </div>
+            <button class="save-button">حفظ التقدم</button>
+            <div class="history-section">
+                <h3>السجل السابق:</h3>
+                <ul class="history-list"></ul>
+            </div>
         </div>
     </div>
+
+    <!-- تحميل السكريبت بعد بناء العناصر -->
     <script src="script.js"></script>
 </body>
 </html>

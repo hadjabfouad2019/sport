@@ -3,40 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مراقبة الوزن - كمال الأجسام</title>
+    <title>مراقبة الوزن</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="container">
+        <a href="index.html" class="back-button">العودة للرئيسية</a>
         <h1>مراقبة الوزن</h1>
 
-        <div class="exercise-box">
-            <h2>سجل وزنك اليوم</h2>
-            
-            <!-- التاريخ التلقائي -->
-            <p style="color: #aaa; margin-bottom: 15px; text-align: center;">
-                <strong>التاريخ:</strong> <span id="current-date">...</span>
-            </p>
-
-            <!-- حقل الوزن -->
-            <input type="number" id="weight-value" placeholder="أدخل وزنك بالكيلوجرام (مثال: 82.5)" min="30" step="0.1" required>
-
-            <!-- زر الحفظ -->
-            <button onclick="saveWeight()">حفظ الوزن</button>
-
-            <!-- سجل التقدم -->
-            <h3>آخر 7 أيام</h3>
-            <div class="history" id="weight-history"></div>
-
-            <!-- شارة الإنجاز -->
-            <div id="weight-badge" class="badge"></div>
+        <div class="weight-section">
+            <div class="input-group">
+                <label>الوزن الحالي (كجم):</label>
+                <input type="number" id="currentWeight" placeholder="أدخل وزنك">
+            </div>
+            <button id="saveWeightButton">حفظ الوزن</button>
+        </div>
+        
+        <div class="achievement-badge" id="achievementBadge" style="display:none;">
+            <h3>💪 إنجاز جديد!</h3>
+            <p>لقد كسرت رقمك القياسي السابق في الوزن.</p>
         </div>
 
-        <div class="nav-footer">
-            <a href="index.html">← العودة للرئيسية</a>
+        <div class="history-section">
+            <h3>آخر 7 أوزان:</h3>
+            <ul id="weightHistoryList"></ul>
         </div>
     </div>
+
     <script src="script.js"></script>
-    
 </body>
 </html>

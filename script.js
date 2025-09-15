@@ -1,187 +1,221 @@
-// script.js
-document.addEventListener('DOMContentLoaded', function() {
-    // عرض التاريخ الحالي بالإنجليزية
-    const dateEl = document.getElementById('current-date');
-    if (dateEl) {
-        dateEl.textContent = new Date().toLocaleDateString('en-US');
-    }
+document.addEventListener('DOMContentLoaded', () => {
 
-    // تحميل جميع البيانات عند فتح الصفحة
-    loadAllData();
+    // ----------------------------------------------------
+    // وظائف عامة للتعامل مع localStorage
+    // ----------------------------------------------------
 
-    // إضافة حدث الحفظ لكل تمرين
-    const saveButtons = document.querySelectorAll('.save-btn');
-    saveButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const exerciseId = this.dataset.exercise;
-            saveProgress(exerciseId);
+    const saveData = (key, data) => {
+        try {
+            localStorage.setItem(key, JSON.stringify(data));
+        } catch (e) {
+            console.error(`خطأ في حفظ البيانات للمفتاح '${key}':`, e);
+        }
+    };
+
+    const loadData = (key) => {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            console.error(`خطأ في تحميل البيانات للمفتاح '${key}':`, e);
+            return [];
+        }
+    };
+
+    // ----------------------------------------------------
+    // منطق صفحات التمارين (day1.html, day2.html, day3.html)
+    // ----------------------------------------------------
+
+    const setupExercisePage = () => {
+        const exerciseCards = document.querySelectorAll('.exercise-card');
+        
+        if (exerciseCards.length === 0) return;
+
+        exerciseCards.forEach(card => {
+            const exerciseId = card.dataset.exercise;
+            const saveButton = card.querySelector('.save-button');
+            const initialWeightInput = card.querySelector('.initial-weight-input');
+            const maxWeightInput = card.querySelector('.max-weight-input');
+            const historyList = card.querySelector('.history-list');
+
+            let history = loadData(exerciseId);
+            
+            const renderHistory = () => {
+                historyList.innerHTML = '';
+                history.forEach((entry, index) => {
+                    const li = document.createElement('li');
+                    
+                    const repsText = Array.isArray(entry.reps)
+                        ? entry.reps.filter(rep => rep !== '').join(' / ') || 'لا يوجد'
+                        : 'لا يوجد';
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = `التاريخ: ${entry.date} | الوزن: ${entry.initialWeight} كجم -> ${entry.maxWeight} كجم | المجموعات: ${entry.sets} | التكرارات: ${repsText}`;
+                    
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'حذف';
+                    deleteButton.classList.add('delete-button');
+                    
+                    deleteButton.addEventListener('click', () => {
+                        history.splice(index, 1);
+                        saveData(exerciseId, history);
+                        renderHistory();
+                    });
+                    
+                    li.appendChild(textSpan);
+                    li.appendChild(deleteButton);
+                    historyList.appendChild(li);
+                });
+            };
+
+            renderHistory();
+
+            if (saveButton) {
+                saveButton.addEventListener('click', () => {
+                    // التحقق من أن حقول الوزن ليست فارغة
+                    if (!initialWeightInput.value || !maxWeightInput.value) {
+                        alert('الرجاء إدخال الوزن الابتدائي وأقصى وزن للتقدم.');
+                        return; // يوقف تنفيذ الدالة إذا كانت الحقول فارغة
+                    }
+
+                    const today = new Date();
+                    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+                    
+                    const newEntry = {
+                        date: formattedDate,
+                        initialWeight: initialWeightInput.value,
+                        maxWeight: maxWeightInput.value,
+                    };
+
+                    history.push(newEntry);
+                    saveData(exerciseId, history);
+                    renderHistory();
+
+                    initialWeightInput.value = '';
+                    maxWeightInput.value = '';
+                });
+            }
         });
-    });
+    };
 
-    // إذا كانت الصفحة هي صفحة الوزن
-    const saveWeightBtn = document.getElementById('save-weight-btn');
-    if (saveWeightBtn) {
-        saveWeightBtn.addEventListener('click', saveWeight);
-    }
+    // ----------------------------------------------------
+    // منطق صفحة مراقبة الوزن (weight.html)
+    // ----------------------------------------------------
 
-    // إذا كانت الصفحة الرئيسية، تهيئة الرسم البياني
-    if (document.getElementById('weight-chart')) {
-        initializeWeightChart();
+    const setupWeightPage = () => {
+        const saveWeightButton = document.getElementById('saveWeightButton');
+        const currentWeightInput = document.getElementById('currentWeight');
+        const weightHistoryList = document.getElementById('weightHistoryList');
+        const achievementBadge = document.getElementById('achievementBadge');
+
+        if (!saveWeightButton) return;
+
+        let weightData = loadData('weightData');
+        
+        const renderWeightHistory = () => {
+            weightHistoryList.innerHTML = '';
+            const recentWeights = weightData.slice(-7);
+            recentWeights.forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = `التاريخ: ${entry.date}: ${entry.weight} كجم`;
+                weightHistoryList.appendChild(li);
+            });
+        };
+
+        renderWeightHistory();
+
+        saveWeightButton.addEventListener('click', () => {
+            const weight = parseFloat(currentWeightInput.value);
+            if (isNaN(weight) || weight <= 0) {
+                alert('الرجاء إدخال وزن صحيح.');
+                return;
+            }
+
+            const maxWeight = weightData.length > 0 ? Math.max(...weightData.map(d => d.weight)) : 0;
+            if (weight > maxWeight) {
+                achievementBadge.style.display = 'block';
+                setTimeout(() => {
+                    achievementBadge.style.display = 'none';
+                }, 5000);
+            }
+
+            const today = new Date();
+            const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+
+            const newEntry = {
+                date: formattedDate,
+                weight: weight
+            };
+
+            weightData.push(newEntry);
+            saveData('weightData', weightData);
+            renderWeightHistory();
+            currentWeightInput.value = '';
+        });
+    };
+
+    // ----------------------------------------------------
+    // منطق الصفحة الرئيسية (index.html)
+    // ----------------------------------------------------
+
+    const setupIndexPage = () => {
+        const weightChartCanvas = document.getElementById('weightChart');
+        if (!weightChartCanvas) return;
+        
+        const weightData = loadData('weightData');
+        const labels = weightData.map(d => d.date);
+        const data = weightData.map(d => d.weight);
+
+        const chartConfig = {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'الوزن بالكيلوجرام',
+                    data: data,
+                    borderColor: 'rgb(0, 123, 255)',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    pointStyle: 'circle',
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'الوزن (كجم)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'التاريخ'
+                        }
+                    }
+                }
+            }
+        };
+
+        new Chart(weightChartCanvas, chartConfig);
+    };
+
+    // تشغيل الوظائف بناءً على الصفحة الحالية
+    if (document.querySelector('.exercise-card')) {
+        setupExercisePage();
+    } else if (document.getElementById('saveWeightButton')) {
+        setupWeightPage();
+    } else if (document.getElementById('weightChart')) {
+        setupIndexPage();
     }
 });
-
-// تحميل جميع البيانات
-function loadAllData() {
-    const exerciseBoxes = document.querySelectorAll('.exercise-box');
-    exerciseBoxes.forEach(box => {
-        const historyDiv = box.querySelector('.history');
-        if (!historyDiv) return;
-        const exerciseId = historyDiv.id.replace('-history', '');
-        const savedData = JSON.parse(localStorage.getItem(exerciseId)) || [];
-        updateExerciseHistory(historyDiv, savedData);
-        fillExerciseFields(exerciseId, savedData);
-    });
-
-    // تحميل بيانات الوزن إذا كانت موجودة
-    if (document.getElementById('weight-history')) {
-        loadWeightHistory();
-    }
-}
-
-// حفظ تقدم التمرين
-function saveProgress(exerciseId) {
-    const startWeight = document.getElementById(`${exerciseId}-start`).value;
-    const maxWeight = document.getElementById(`${exerciseId}-max`).value;
-    const sets = document.getElementById(`${exerciseId}-sets`).value; // نص
-    const reps = document.getElementById(`${exerciseId}-reps`).value; // نص
-
-    if (!startWeight || !maxWeight) {
-        alert('الرجاء إدخال الوزن الابتدائي والوزن الأقصى');
-        return;
-    }
-
-    const newRecord = {
-        date: new Date().toLocaleDateString('en-US'),
-        startWeight: parseFloat(startWeight),
-        maxWeight: parseFloat(maxWeight),
-        sets: sets,    // نص
-        reps: reps     // نص
-    };
-
-    const currentData = JSON.parse(localStorage.getItem(exerciseId)) || [];
-    currentData.push(newRecord);
-    localStorage.setItem(exerciseId, JSON.stringify(currentData));
-
-    const historyDiv = document.getElementById(`${exerciseId}-history`);
-    updateExerciseHistory(historyDiv, currentData);
-
-    alert('تم حفظ التقدم بنجاح ✅');
-}
-
-// ملء الحقول بآخر البيانات
-function fillExerciseFields(exerciseId, data) {
-    if (data.length === 0) return;
-    const lastRecord = data[data.length - 1];
-    document.getElementById(`${exerciseId}-start`).value = lastRecord.startWeight || '';
-    document.getElementById(`${exerciseId}-max`).value = lastRecord.maxWeight || '';
-    document.getElementById(`${exerciseId}-sets`).value = lastRecord.sets || '';
-    document.getElementById(`${exerciseId}-reps`).value = lastRecord.reps || '';
-}
-
-// تحديث سجل التمرين (يعرض فقط الوزن)
-function updateExerciseHistory(historyDiv, data) {
-    if (data.length === 0) {
-        historyDiv.innerHTML = '<p>لا توجد بيانات بعد. ابدأ بتتبع تقدمك!</p>';
-        return;
-    }
-
-    const recentData = data.slice(-5);
-    historyDiv.innerHTML = recentData.map(record => `
-        <div class="record-item">
-            <span class="record-date">${record.date}</span>:
-            البداية: <strong>${record.startWeight}kg</strong> | 
-            الحد الأقصى: <strong>${record.maxWeight}kg</strong>
-        </div>
-    `).join('');
-}
-
-// تحميل سجل الوزن
-function loadWeightHistory() {
-    const weightData = JSON.parse(localStorage.getItem('weightData')) || [];
-    const historyDiv = document.getElementById('weight-history');
-    updateWeightHistory(historyDiv, weightData);
-}
-
-// تحديث سجل الوزن
-function updateWeightHistory(historyDiv, data) {
-    if (data.length === 0) {
-        historyDiv.innerHTML = '<p>لا توجد بيانات للوزن بعد. ابدأ بتتبع وزنك!</p>';
-        return;
-    }
-
-    const recentData = data.slice(-30);
-    historyDiv.innerHTML = recentData.map(record => `
-        <div class="record-item">
-            <span class="record-date">${record.date}</span>: <strong>${record.weight}kg</strong>
-        </div>
-    `).join('');
-}
-
-// حفظ الوزن
-function saveWeight() {
-    const weightInput = document.getElementById('weight-value');
-    const weight = weightInput.value;
-
-    if (!weight) {
-        alert('الرجاء إدخال وزنك');
-        return;
-    }
-
-    const newRecord = {
-        date: new Date().toLocaleDateString('en-US'),
-        weight: parseFloat(weight)
-    };
-
-    const weightData = JSON.parse(localStorage.getItem('weightData')) || [];
-    weightData.push(newRecord);
-
-    // الاحتفاظ بآخر 30 يوم فقط
-    const recentData = weightData.slice(-30);
-    localStorage.setItem('weightData', JSON.stringify(recentData));
-
-    updateWeightHistory(document.getElementById('weight-history'), recentData);
-    alert('تم حفظ الوزن بنجاح ✅');
-    weightInput.value = '';
-}
-
-// تهيئة الرسم البياني للوزن
-function initializeWeightChart() {
-    const weightData = JSON.parse(localStorage.getItem('weightData')) || [];
-    if (weightData.length === 0) return;
-
-    const ctx = document.getElementById('weight-chart');
-    if (!ctx) return;
-
-    const dates = weightData.map(record => record.date);
-    const weights = weightData.map(record => record.weight);
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [{
-                label: 'Weight (kg)',
-                data: weights,
-                borderColor: '#3498db',
-                backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                tension: 0.3,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: false } }
-        }
-    });
-}

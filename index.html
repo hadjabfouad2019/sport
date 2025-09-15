@@ -5,36 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>كمال الأجسام</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
     <div class="container">
         <h1>كمال الأجسام</h1>
 
-        <div class="tabs">
-            <a href="day1.html" class="tab-btn">اليوم 1</a> 
-            <a href="day2.html" class="tab-btn">اليوم 2</a> 
-            <a href="day3.html" class="tab-btn">اليوم 3</a> 
-            <a href="weight.html" class="tab-btn">الوزن</a>
+        <div class="buttons-container">
+            <a href="day1.html" class="nav-button">اليوم 1</a>
+            <a href="day2.html" class="nav-button">اليوم 2</a>
+            <a href="day3.html" class="nav-button">اليوم 3</a>
+            <a href="weight.html" class="nav-button">مراقبة الوزن</a>
         </div>
 
-        <p class="subtitle">سجل تقدمك يومًا بعد يوم.</p>
-
-        <!-- ========================= -->
-        <!-- 📊 رسم بياني تطور الوزن -->
-        <!-- ========================= -->
-        <div class="weight-chart-container">
-            <h2>📊 تطور وزنك هذا الأسبوع</h2>
-            <canvas id="weight-chart" height="150"></canvas>
-        </div>
-
-        <div class="nav-footer">
-            <p style="font-size: 0.9rem; color: #aaa; margin-top: 30px;">
-                كل بياناتك محفوظة على جهازك فقط — لا تُرسل لأي خادم.
-            </p>
+        <div class="chart-container">
+            <h2>تطور الوزن</h2>
+            <canvas id="weightChart"></canvas>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
