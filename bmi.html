@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة السعرات الحرارية</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-button">العودة للرئيسية</a>
+        <h1>حاسبة السعرات الحرارية</h1>
+
+        <div class="calculator-card">
+            <div class="input-group">
+                <label for="gender">الجنس:</label>
+                <select id="gender" class="form-control">
+                    <option value="male">ذكر</option>
+                    <option value="female">أنثى</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="age">العمر (سنوات):</label>
+                <input type="number" id="age" class="form-control" placeholder="أدخل عمرك">
+            </div>
+            <div class="input-group">
+                <label for="height">الطول (سم):</label>
+                <input type="number" id="height" class="form-control" placeholder="أدخل طولك">
+            </div>
+            <div class="input-group">
+                <label for="weight">الوزن (كجم):</label>
+                <input type="number" id="weight" class="form-control" placeholder="أدخل وزنك">
+            </div>
+            <div class="input-group">
+                <label for="activity">مستوى النشاط:</label>
+                <select id="activity" class="form-control">
+                    <option value="1.2">قليل جداً (عمل مكتبي، لا يوجد تمرين)</option>
+                    <option value="1.375">قليل (تمرين 1-3 مرات/أسبوع)</option>
+                    <option value="1.55">معتدل (تمرين 3-5 مرات/أسبوع)</option>
+                    <option value="1.725">مرتفع (تمرين 6-7 مرات/أسبوع)</option>
+                    <option value="1.9">مرتفع جداً (تمرين يومي مكثف)</option>
+                </select>
+            </div>
+
+            <button id="calculateButton" class="save-button">احسب احتياجاتي</button>
+        </div>
+
+        <div id="results" class="results-card" style="display: none;">
+            <h2>احتياجاتك اليومية:</h2>
+            <p>السعرات الحرارية: <span id="caloriesResult"></span> سعرة حرارية</p>
+            <p>البروتين: <span id="proteinResult"></span> جرام</p>
+            <p>الكربوهيدرات: <span id="carbsResult"></span> جرام</p>
+            <p>الدهون: <span id="fatsResult"></span> جرام</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

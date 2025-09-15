@@ -45,12 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 history.forEach((entry, index) => {
                     const li = document.createElement('li');
                     
-                    const repsText = Array.isArray(entry.reps)
-                        ? entry.reps.filter(rep => rep !== '').join(' / ') || 'لا يوجد'
-                        : 'لا يوجد';
-                    
                     const textSpan = document.createElement('span');
-                    textSpan.textContent = `التاريخ: ${entry.date} | الوزن: ${entry.initialWeight} كجم -> ${entry.maxWeight} كجم | المجموعات: ${entry.sets} | التكرارات: ${repsText}`;
+                    textSpan.textContent = `التاريخ: ${entry.date} | الوزن: ${entry.initialWeight} كجم -> ${entry.maxWeight} كجم`;
                     
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'حذف';
@@ -72,10 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (saveButton) {
                 saveButton.addEventListener('click', () => {
-                    // التحقق من أن حقول الوزن ليست فارغة
                     if (!initialWeightInput.value || !maxWeightInput.value) {
                         alert('الرجاء إدخال الوزن الابتدائي وأقصى وزن للتقدم.');
-                        return; // يوقف تنفيذ الدالة إذا كانت الحقول فارغة
+                        return;
                     }
 
                     const today = new Date();
@@ -209,6 +204,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         new Chart(weightChartCanvas, chartConfig);
     };
+    
+    // ----------------------------------------------------
+    // منطق صفحة حاسبة السعرات الحرارية (bmi.html)
+    // ----------------------------------------------------
+
+    const setupBmiPage = () => {
+        const calculateButton = document.getElementById('calculateButton');
+        const resultsDiv = document.getElementById('results');
+        const genderInput = document.getElementById('gender');
+        const ageInput = document.getElementById('age');
+        const heightInput = document.getElementById('height');
+        const weightInput = document.getElementById('weight');
+        const activityInput = document.getElementById('activity');
+
+        if (!calculateButton) return;
+
+        calculateButton.addEventListener('click', () => {
+            const gender = genderInput.value;
+            const age = parseFloat(ageInput.value);
+            const height = parseFloat(heightInput.value);
+            const weight = parseFloat(weightInput.value);
+            const activityLevel = parseFloat(activityInput.value);
+
+            if (isNaN(age) || isNaN(height) || isNaN(weight) || age <= 0 || height <= 0 || weight <= 0) {
+                alert('الرجاء إدخال بيانات صحيحة.');
+                return;
+            }
+
+            // Mifflin-St Jeor Formula
+            let bmr = 0;
+            if (gender === 'male') {
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+            } else {
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+            }
+
+            const tdee = bmr * activityLevel;
+            const protein = weight * 2; // تقريباً 2 جرام بروتين لكل كجم من وزن الجسم
+            const fats = tdee * 0.25 / 9; // 25% من السعرات من الدهون، كل جرام دهون = 9 سعرات
+            const carbs = (tdee - (protein * 4) - (fats * 9)) / 4; // السعرات المتبقية من الكربوهيدرات
+
+            document.getElementById('caloriesResult').textContent = Math.round(tdee);
+            document.getElementById('proteinResult').textContent = Math.round(protein);
+            document.getElementById('carbsResult').textContent = Math.round(carbs);
+            document.getElementById('fatsResult').textContent = Math.round(fats);
+            
+            resultsDiv.style.display = 'block';
+        });
+    };
 
     // تشغيل الوظائف بناءً على الصفحة الحالية
     if (document.querySelector('.exercise-card')) {
@@ -217,5 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupWeightPage();
     } else if (document.getElementById('weightChart')) {
         setupIndexPage();
+    } else if (document.getElementById('calculateButton')) {
+        setupBmiPage();
     }
 });
